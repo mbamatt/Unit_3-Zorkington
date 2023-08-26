@@ -14,23 +14,114 @@
 */
 
 export const gameDetails = {   
-    title: 'Game Title',
-    desc: 'Welcome to the world of... here are some quick rules & concepts...',
-    author: 'Student Name',
+    title: 'Zorkington: The Quest for Denver',
+    desc: 'A thriling quest in the Kindgom of Denver',
+    author: 'Matthew Martinez',
     cohort: 'SBPT-2022',
-    startingRoomDescription: 'What you see before you is...',
+    startingRoomDescription: 'You find yourself in a dimly lit room',
     playerCommands: [
         // replace these with your games commands as needed
-        'inspect', 'view', 'look', 'pickup',
+        'inspect', 'view', 'look', 'pickup', 'go', 'use',
     ]
     // Commands are basic things that a player can do throughout the game besides possibly moving to another room. This line will populate on the footer of your game for players to reference. 
     // This shouldn't be more than 6-8 different commands.
 }
+class Item {
+    constructor(name, description, location) {
+        this.name = name;
+        this.description = description;
+        this.location = location;
+    }
 
+    interact() {
+
+        return `You look at ${this.name}, ${this.description}`;
+    }
+}
+
+class Room {
+    constructor(description, exits) {
+        this.description = description;
+        this.exits = exits;
+        this.items = [];
+    }
+    addItem(item) {
+        this.items.push(item);
+    }
+}
+
+let livingRoom = new Room("You're in the living room. There's a couch and a TV.", {north: "kitchen"});
+let kitchen = new Room("It's the kitchen. Smells like cookies!", {south: "LivingRoom"});
+
+let remote = new Item("Remote" , "Used for changing channels on the TV.", "livingRoom");
+
+//Initializing some rooms and items 
+let currentRoom = livingRoom;
+
+function displayRoom(room) {
+    return room.description;
+}
+
+function startGame() {
+    return displayRoom(currentRoom);
+}
+
+function handleInput(playerInput) {
+    let response = "";
+    if(gameDetails.playerCommands.includes(playerInput)) {
+        response = "Doing something with " + playerInput;
+    } else {
+        response = "I don't know how to " + playerInput;
+    }
+    return response;
+}
+
+class Player {
+    constructor() {
+        this.inventory = [];
+    }
+
+    pickUp(item) {
+        this.inventory.push(item);
+        currentRoom.items = currentRoom.items.filter(i => i !== item);
+        return `${item.name} has been picked up!`;
+    }
+}
+
+let player = new Player();
+
+function move(direction) {
+    if (currentRoom.exits[direction]) {
+        currentRoom = Room[newRoomName];
+        return displayRoom(currentRoom);
+    } else {
+        return `${direction} room cannot be accessed from here.`;
+    }
+}
+Player.prototype.dropItem = function(itemName) {
+    let itemIndex = this.inventory.findIndex(i => i.name === itemName);
+
+    if (itemIndex > -1) {
+        let item = this.inventory.splice(itemIndex, 1)[0];
+        currentRoom.addItem(item);
+        return `${itemName} has been dropped in ${currentRoom.description}.`;
+    } else {
+        return `You don't have a ${itemName} to drop.`;
+    }
+}
 // Your code here
 
 export const domDisplay = (playerInput) => {
-    /* 
+    if (gameDetails.playerCommands.includes(playerinput)) {
+        if (playerInput === "view") {
+            return displayRoom(currentRoom);
+      } else if (playerInput.StartsWith("pickup")) {
+
+      }
+    } else{
+        return "I don't understand that command.";
+    }
+    /* git 
         TODO: for students
         - This function must return a string. 
         - This will be the information that is displayed within the browsers game interface above the users input field.
